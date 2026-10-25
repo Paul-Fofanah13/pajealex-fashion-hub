@@ -1,0 +1,44 @@
+{% extends "admin_base.html" %}
+{% block title %}Dashboard | Admin{% endblock %}
+{% block admin_content %}
+<section class="section">
+  <div class="container">
+    <h1 style="font-size:2rem">Dashboard</h1>
+    <div class="stat-grid">
+      <div class="stat"><span class="stat-num">{{ stats.orders }}</span><span>Total orders</span></div>
+      <div class="stat"><span class="stat-num">{{ stats.pending }}</span><span>Pending orders</span></div>
+      <div class="stat"><span class="stat-num">{{ stats.sales|naira }}</span><span>Total sales (not cancelled)</span></div>
+      <div class="stat"><span class="stat-num">{{ stats.paid|naira }}</span><span>Confirmed paid</span></div>
+      <div class="stat"><span class="stat-num">{{ stats.products }}</span><span>Products</span></div>
+      <div class="stat"><span class="stat-num">{{ stats.subscribers }}</span><span>Newsletter subscribers</span></div>
+    </div>
+
+    <form method="post" action="{{ url_for('admin_backup') }}" class="info-box backup-box">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+      <div><strong>Back up your data</strong><p class="muted" style="margin:0">Download your database (orders, customers, products). Do this regularly and keep the file safe: it contains customer details.</p></div>
+      <button class="btn btn-dark" type="submit">Download backup</button>
+    </form>
+
+    <div class="two-col">
+      <div>
+        <div class="section-head"><h2>Recent orders</h2><a href="{{ url_for('admin_orders') }}">All orders</a></div>
+        {% if recent %}
+        <div class="table-wrap"><table class="table">
+          <thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody>{% for o in recent %}
+            <tr><td><a href="{{ url_for('admin_order_detail', order_id=o.id) }}">{{ o.order_number }}</a></td><td>{{ o.customer_name }}</td><td>{{ o.total|naira }}</td><td><span class="pill pill-{{ o.status|lower }}">{{ o.status }}</span></td></tr>
+          {% endfor %}</tbody></table></div>
+        {% else %}<p class="empty">No orders yet. They will appear here.</p>{% endif %}
+      </div>
+      <div>
+        <div class="section-head"><h2>Low stock</h2><a href="{{ url_for('admin_products') }}">Manage stock</a></div>
+        {% if low_stock %}
+        <ul class="plain-list">{% for p in low_stock %}
+          <li><a href="{{ url_for('admin_product_edit', product_id=p.id) }}">{{ p.name }}</a> <strong class="{{ 'text-red' if p.stock == 0 }}">{{ p.stock }} left</strong></li>
+        {% endfor %}</ul>
+        {% else %}<p class="empty">Every product has more than 5 in stock.</p>{% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

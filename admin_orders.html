@@ -1,0 +1,31 @@
+{% extends "admin_base.html" %}
+{% block title %}Orders | Admin{% endblock %}
+{% block admin_content %}
+<section class="section">
+  <div class="container">
+    <h1 style="font-size:2rem">Orders</h1>
+    <form class="filters" method="get" action="{{ url_for('admin_orders') }}">
+      <input type="search" name="q" value="{{ q }}" placeholder="Order number, name or phone" aria-label="Search orders" maxlength="60">
+      <select name="status" aria-label="Status">
+        <option value="">All statuses</option>
+        {% for s in statuses %}<option value="{{ s }}" {% if s == status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+      </select>
+      <button class="btn btn-dark" type="submit">Filter</button>
+      {% if q or status %}<a class="btn" href="{{ url_for('admin_orders') }}">Clear</a>{% endif %}
+    </form>
+    {% if orders %}
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Phone</th><th>Total</th><th>Payment</th><th>Status</th></tr></thead>
+      <tbody>{% for o in orders %}
+        <tr>
+          <td><a href="{{ url_for('admin_order_detail', order_id=o.id) }}">{{ o.order_number }}</a></td>
+          <td>{{ o.created_at|pretty_date }}</td><td>{{ o.customer_name }}</td><td>{{ o.phone }}</td><td>{{ o.total|naira }}</td>
+          <td><span class="pill pill-{{ o.payment_status|lower }}">{{ o.payment_status }}</span></td>
+          <td><span class="pill pill-{{ o.status|lower }}">{{ o.status }}</span></td>
+        </tr>{% endfor %}</tbody></table></div>
+    {% else %}
+    <div class="empty-box"><h2>No orders found</h2><p>{% if q or status %}Try clearing the filters.{% else %}New orders will appear here.{% endif %}</p></div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

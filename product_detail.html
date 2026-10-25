@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% from "_macros.html" import product_card with context %}
+{% block title %}{{ product.name }} | {{ store.name }}{% endblock %}
+{% block description %}{{ product.description[:150] }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <p class="crumbs"><a href="{{ url_for('shop') }}">Shop</a> / <a href="{{ url_for('shop', category=product.category) }}">{{ product.category }}</a> / {{ product.name }}</p>
+    <div class="detail">
+      <div class="detail-img"><img src="{{ product_image(product.image) }}" alt="{{ product.name }}"></div>
+      <div class="detail-info">
+        <h1>{{ product.name }}</h1>
+        <p class="price price-lg">{{ product.price|naira }}</p>
+        <p class="stock {{ 'stock-out' if product.stock <= 0 else '' }}">
+          {% if product.stock <= 0 %}Sold out
+          {% elif product.stock <= 5 %}Only {{ product.stock }} left
+          {% else %}In stock{% endif %}
+        </p>
+        <p class="detail-desc">{{ product.description }}</p>
+        {% if product.stock > 0 %}
+        <form method="post" action="{{ url_for('cart_add') }}" class="detail-form js-loading">
+          <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+          <input type="hidden" name="product_id" value="{{ product.id }}">
+          <input type="hidden" name="next" value="{{ request.path }}">
+          <label for="qty">Quantity</label>
+          <input id="qty" type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" required>
+          <button class="btn btn-orange" type="submit">Add to cart</button>
+        </form>
+        {% if in_cart %}<p class="muted">You have {{ in_cart }} in your cart. <a href="{{ url_for('cart') }}">View cart</a></p>{% endif %}
+        {% else %}
+        <button class="btn" type="button" disabled>Sold out</button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% if related %}
+<section class="section section-grey">
+  <div class="container">
+    <div class="section-head"><h2>More in {{ product.category }}</h2></div>
+    <div class="grid">{% for p in related %}{{ product_card(p) }}{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

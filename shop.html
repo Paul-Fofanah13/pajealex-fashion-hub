@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "_macros.html" import product_card with context %}
+{% block title %}{{ category or 'Shop' }} | {{ store.name }}{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div class="container">
+    <h1>{{ category or 'All products' }}</h1>
+    <p>{{ products|length }} product{{ '' if products|length == 1 else 's' }}{% if q %} matching &ldquo;{{ q }}&rdquo;{% endif %}</p>
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <form class="filters" method="get" action="{{ url_for('shop') }}">
+      <input type="search" name="q" value="{{ q }}" placeholder="Search products" aria-label="Search products" maxlength="80">
+      <select name="category" aria-label="Category">
+        <option value="">All categories</option>
+        {% for c in categories %}<option value="{{ c }}" {% if c == category %}selected{% endif %}>{{ c }}</option>{% endfor %}
+      </select>
+      <select name="sort" aria-label="Sort by">
+        {% for key, option in sort_options.items() %}<option value="{{ key }}" {% if key == sort %}selected{% endif %}>{{ option[0] }}</option>{% endfor %}
+      </select>
+      <button class="btn btn-dark" type="submit">Apply</button>
+      {% if q or category or sort != 'newest' %}<a class="btn" href="{{ url_for('shop') }}">Clear</a>{% endif %}
+    </form>
+    {% if products %}
+    <div class="grid">{% for p in products %}{{ product_card(p) }}{% endfor %}</div>
+    {% else %}
+    <div class="empty-box">
+      <h2>No products found</h2>
+      <p>Try a different search word or clear the filters.</p>
+      <a class="btn btn-dark" href="{{ url_for('shop') }}">Show all products</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

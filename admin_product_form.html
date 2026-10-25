@@ -1,0 +1,40 @@
+{% extends "admin_base.html" %}
+{% macro err(name) %}{% if errors.get(name) %}<span class="field-error">{{ errors[name] }}</span>{% endif %}{% endmacro %}
+{% set v = values %}
+{% block title %}{{ 'Edit product' if product else 'Add product' }} | Admin{% endblock %}
+{% block admin_content %}
+<section class="section">
+  <div class="container narrow">
+    <h1 style="font-size:2rem">{{ 'Edit product' if product else 'Add product' }}</h1>
+    <form method="post" enctype="multipart/form-data" class="form js-loading" novalidate>
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+      {% if errors %}<div class="flash flash-error" role="alert"><span>Please fix the highlighted fields.</span></div>{% endif %}
+      <div class="field {{ 'has-error' if errors.get('name') }}"><label for="name">Product name</label><input id="name" name="name" value="{{ v.get('name', '') }}" required maxlength="120">{{ err('name') }}</div>
+      <div class="field {{ 'has-error' if errors.get('description') }}"><label for="description">Description</label><textarea id="description" name="description" rows="4" maxlength="2000">{{ v.get('description', '') }}</textarea>{{ err('description') }}</div>
+      <div class="field-row">
+        <div class="field {{ 'has-error' if errors.get('price') }}"><label for="price">Price (&#8358;)</label><input id="price" name="price" type="number" min="0" step="1" value="{{ v.get('price', '') }}" required>{{ err('price') }}</div>
+        <div class="field {{ 'has-error' if errors.get('stock') }}"><label for="stock">Stock quantity</label><input id="stock" name="stock" type="number" min="0" step="1" value="{{ v.get('stock', '') }}" required>{{ err('stock') }}</div>
+      </div>
+      <div class="field {{ 'has-error' if errors.get('category') }}">
+        <label for="category">Category</label>
+        <select id="category" name="category" required>
+          <option value="">Choose a category</option>
+          {% for c in categories %}<option value="{{ c }}" {% if v.get('category') == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+        </select>{{ err('category') }}
+      </div>
+      <div class="field {{ 'has-error' if errors.get('image') }}">
+        <label for="image">Product photo {% if product %}<span class="muted">(leave empty to keep the current one)</span>{% endif %}</label>
+        {% if product %}<img class="thumb thumb-lg" src="{{ product_image(product.image) }}" alt="Current photo">{% endif %}
+        <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+        <span class="muted">JPG, PNG, WEBP or GIF, up to 5 MB. Square photos look best.</span>{{ err('image') }}
+      </div>
+      <label class="check"><input type="checkbox" name="featured" value="1" {% if v.get('featured') %}checked{% endif %}> Show in Featured products</label>
+      <label class="check"><input type="checkbox" name="best_seller" value="1" {% if v.get('best_seller') %}checked{% endif %}> Show in Best sellers</label>
+      <div class="form-actions">
+        <button class="btn btn-orange btn-lg" type="submit">{{ 'Save changes' if product else 'Add product' }}</button>
+        <a class="btn btn-lg" href="{{ url_for('admin_products') }}">Cancel</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

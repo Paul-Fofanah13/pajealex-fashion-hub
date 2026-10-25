@@ -1,0 +1,24 @@
+{% macro product_card(p) %}
+<article class="card">
+  <a class="card-img" href="{{ url_for('product_detail', product_id=p.id) }}">
+    <img src="{{ product_image(p.image) }}" alt="{{ p.name }}" loading="lazy">
+    {% if p.stock <= 0 %}<span class="badge badge-out">Sold out</span>
+    {% elif p.stock <= 5 %}<span class="badge">Only {{ p.stock }} left</span>{% endif %}
+  </a>
+  <div class="card-body">
+    <p class="card-cat">{{ p.category }}</p>
+    <h3><a href="{{ url_for('product_detail', product_id=p.id) }}">{{ p.name }}</a></h3>
+    <p class="price">{{ p.price|naira }}</p>
+    {% if p.stock > 0 %}
+    <form method="post" action="{{ url_for('cart_add') }}" class="js-loading">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+      <input type="hidden" name="product_id" value="{{ p.id }}">
+      <input type="hidden" name="next" value="{{ request.full_path.rstrip('?') }}">
+      <button class="btn btn-dark btn-block" type="submit">Add to cart</button>
+    </form>
+    {% else %}
+    <button class="btn btn-block" type="button" disabled>Sold out</button>
+    {% endif %}
+  </div>
+</article>
+{% endmacro %}

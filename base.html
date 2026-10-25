@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ store.name }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}Clothing, shoes, sneakers and accessories from Pajealex Fashion Hub.{% endblock %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="container header-row">
+    <a class="logo" href="{{ url_for('index') }}" aria-label="{{ store.name }} home">
+      <span class="logo-mark">P</span>
+      <span class="logo-text">Pajealex<small>Fashion Hub</small></span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav" aria-label="Open menu"><span></span><span></span><span></span></button>
+    <nav id="nav" class="nav">
+      <a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}aria-current="page"{% endif %}>Home</a>
+      <a href="{{ url_for('shop') }}" {% if request.endpoint == 'shop' and not request.args.get('category') %}aria-current="page"{% endif %}>Shop</a>
+      <div class="dropdown">
+        <button class="dropdown-btn" type="button" aria-expanded="false">Categories</button>
+        <div class="dropdown-menu">
+          {% for c in categories %}<a href="{{ url_for('shop', category=c) }}">{{ c }}</a>{% endfor %}
+        </div>
+      </div>
+      <a href="{{ url_for('about') }}" {% if request.endpoint == 'about' %}aria-current="page"{% endif %}>About</a>
+      <a href="{{ url_for('contact') }}" {% if request.endpoint == 'contact' %}aria-current="page"{% endif %}>Contact</a>
+      <form class="search" action="{{ url_for('shop') }}" method="get" role="search">
+        <input type="search" name="q" placeholder="Search products" value="{{ request.args.get('q', '') }}" aria-label="Search products" maxlength="80">
+        <button type="submit" aria-label="Search">Go</button>
+      </form>
+    </nav>
+    <a class="cart-link" href="{{ url_for('cart') }}" aria-label="Cart, {{ cart_count }} item{{ '' if cart_count == 1 else 's' }}">
+      Cart <span class="cart-count" id="cart-count">{{ cart_count }}</span>
+    </a>
+  </div>
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="container flashes" aria-live="polite">
+  {% for category, message in messages %}
+  <div class="flash flash-{{ category }}" role="status">
+    <span>{{ message }}</span>
+    <button type="button" class="flash-close" aria-label="Dismiss message">&times;</button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<main id="main">{% block content %}{% endblock %}</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <a class="logo logo-light" href="{{ url_for('index') }}">
+        <span class="logo-mark">P</span>
+        <span class="logo-text">Pajealex<small>Fashion Hub</small></span>
+      </a>
+      <p class="muted-light">Clothing, shoes, sneakers and accessories, delivered to your door.</p>
+    </div>
+    <div>
+      <h4>Shop</h4>
+      <ul>
+        {% for c in categories %}<li><a href="{{ url_for('shop', category=c) }}">{{ c }}</a></li>{% endfor %}
+        <li><a href="{{ url_for('shop') }}">All products</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul>
+        {% if store.phone %}<li>{{ store.phone }}</li>{% endif %}
+        {% if store.email %}<li><a href="mailto:{{ store.email }}">{{ store.email }}</a></li>{% endif %}
+        {% if store.address %}<li>{{ store.address }}</li>{% endif %}
+        {% if store.whatsapp %}<li><a href="https://wa.me/{{ store.whatsapp }}" rel="noopener" target="_blank">Chat on WhatsApp</a></li>{% endif %}
+        {% if not (store.phone or store.email or store.address or store.whatsapp) %}<li>Nigeria</li>{% endif %}
+        <li><a href="{{ url_for('contact') }}">Contact page</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Follow us</h4>
+      <ul>
+        {% if store.instagram %}<li><a href="{{ store.instagram }}" rel="noopener" target="_blank">Instagram</a></li>{% endif %}
+        {% if store.facebook %}<li><a href="{{ store.facebook }}" rel="noopener" target="_blank">Facebook</a></li>{% endif %}
+        {% if store.tiktok %}<li><a href="{{ store.tiktok }}" rel="noopener" target="_blank">TikTok</a></li>{% endif %}
+        {% if not (store.instagram or store.facebook or store.tiktok) %}<li class="muted-light">Social links coming soon.</li>{% endif %}
+      </ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">&copy; {{ current_year }} {{ store.name }}. All rights reserved.</div>
+</footer>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

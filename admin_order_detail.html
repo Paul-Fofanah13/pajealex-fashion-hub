@@ -1,0 +1,41 @@
+{% extends "admin_base.html" %}
+{% block title %}Order {{ order.order_number }} | Admin{% endblock %}
+{% block admin_content %}
+<section class="section">
+  <div class="container">
+    <p class="crumbs"><a href="{{ url_for('admin_orders') }}">Orders</a> / {{ order.order_number }}</p>
+    <h1 style="font-size:2rem">Order {{ order.order_number }}</h1>
+    <div class="two-col">
+      <div>
+        <h2>Customer and delivery</h2>
+        <div class="info-box">
+          <p><strong>{{ order.customer_name }}</strong></p>
+          <p>Phone: {{ order.phone }}{% if wa_customer %} &middot; <a href="{{ wa_customer }}" target="_blank" rel="noopener">Message on WhatsApp</a>{% endif %}</p>
+          {% if order.email %}<p>Email: <a href="mailto:{{ order.email }}">{{ order.email }}</a></p>{% endif %}
+          <p>Address: {{ order.address }}</p>
+          {% if order.notes %}<p>Notes: {{ order.notes }}</p>{% endif %}
+          <p class="muted">Placed {{ order.created_at|pretty_date }} (UTC) &middot; {{ order.payment_method }}</p>
+        </div>
+        <h2>Items</h2>
+        <div class="summary summary-flat">
+          {% for item in items %}<div class="sum-row"><span>{{ item.quantity }} &times; {{ item.product_name }} ({{ item.unit_price|naira }})</span><span>{{ (item.unit_price * item.quantity)|naira }}</span></div>{% endfor %}
+          <div class="sum-row sum-total"><span>Total</span><span>{{ order.total|naira }}</span></div>
+        </div>
+      </div>
+      <div>
+        <h2>Update order</h2>
+        <form method="post" action="{{ url_for('admin_order_update', order_id=order.id) }}" class="form info-box js-loading">
+          <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+          <div class="field"><label for="status">Order status</label>
+            <select id="status" name="status">{% for s in statuses %}<option value="{{ s }}" {% if s == order.status %}selected{% endif %}>{{ s }}</option>{% endfor %}</select></div>
+          <div class="field"><label for="payment_status">Payment status</label>
+            <select id="payment_status" name="payment_status">{% for s in payment_statuses %}<option value="{{ s }}" {% if s == order.payment_status %}selected{% endif %}>{{ s }}</option>{% endfor %}</select>
+            <span class="muted">Only set Paid after you have really received the money (or Paystack confirmed it).</span></div>
+          <button class="btn btn-orange btn-block" type="submit">Save changes</button>
+          <p class="muted">Cancelling an order puts its items back into stock.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

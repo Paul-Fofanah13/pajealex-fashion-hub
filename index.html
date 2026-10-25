@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% from "_macros.html" import product_card with context %}
+{% block content %}
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <h1>Upgrade Your Style with Pajealex</h1>
+      <p>Native wear, sets, sneakers and accessories picked for how you actually dress. Order online and we deliver.</p>
+      <div class="hero-actions">
+        <a class="btn btn-orange" href="{{ url_for('shop') }}">Shop Now</a>
+        <a class="btn btn-outline-light" href="#collections">Explore Collection</a>
+      </div>
+    </div>
+    <div class="hero-art">
+      {% if featured %}
+      <a href="{{ url_for('product_detail', product_id=featured[0].id) }}">
+        <img src="{{ product_image(featured[0].image) }}" alt="{{ featured[0].name }}">
+        <span class="hero-tag">{{ featured[0].name }} <strong>{{ featured[0].price|naira }}</strong></span>
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="section" id="collections">
+  <div class="container">
+    <div class="section-head"><h2>Shop by category</h2><a href="{{ url_for('shop') }}">View all products</a></div>
+    <div class="cat-grid">
+      {% for c in categories %}
+      <a class="cat-tile" href="{{ url_for('shop', category=c) }}">
+        <span class="cat-name">{{ c }}</span>
+        <span class="cat-count">{{ counts.get(c, 0) }} item{{ '' if counts.get(c, 0) == 1 else 's' }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section section-grey">
+  <div class="container">
+    <div class="section-head"><h2>Featured products</h2><a href="{{ url_for('shop') }}">Shop all</a></div>
+    {% if featured %}<div class="grid">{% for p in featured %}{{ product_card(p) }}{% endfor %}</div>
+    {% else %}<p class="empty">No featured products yet.</p>{% endif %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head"><h2>New arrivals</h2></div>
+    {% if new_arrivals %}<div class="grid">{% for p in new_arrivals %}{{ product_card(p) }}{% endfor %}</div>
+    {% else %}<p class="empty">New arrivals will appear here.</p>{% endif %}
+  </div>
+</section>
+
+<section class="promo">
+  <div class="container promo-row">
+    <h2>Order on WhatsApp, pay when it arrives.</h2>
+    <a class="btn btn-dark" href="{{ url_for('shop') }}">Start shopping</a>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head"><h2>Best sellers</h2></div>
+    {% if best_sellers %}<div class="grid">{% for p in best_sellers %}{{ product_card(p) }}{% endfor %}</div>
+    {% else %}<p class="empty">Best sellers will appear here.</p>{% endif %}
+  </div>
+</section>
+
+<section class="section section-grey">
+  <div class="container">
+    <div class="section-head"><h2>What customers say</h2></div>
+    <p class="notice">Sample reviews: these are placeholders until real customers leave their own.</p>
+    <div class="review-grid">
+      <blockquote class="review"><p>The outfit fit well and arrived quickly. Sample review.</p><footer>Sample customer, Lagos</footer></blockquote>
+      <blockquote class="review"><p>Easy to order on WhatsApp and the seller replied fast. Sample review.</p><footer>Sample customer, Abuja</footer></blockquote>
+      <blockquote class="review"><p>Good quality for the price. I will order again. Sample review.</p><footer>Sample customer, Ibadan</footer></blockquote>
+    </div>
+  </div>
+</section>
+
+<section class="newsletter" id="newsletter">
+  <div class="container newsletter-row">
+    <div><h2>Get new arrivals first</h2><p>Join our list. No spam, just new drops and offers.</p></div>
+    <form method="post" action="{{ url_for('newsletter') }}" class="newsletter-form js-loading">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+      <label class="sr-only" for="nl-email">Email address</label>
+      <input id="nl-email" type="email" name="email" placeholder="Your email address" required maxlength="120">
+      <button class="btn btn-orange" type="submit">Subscribe</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Order {{ order.order_number }} | {{ store.name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container narrow">
+    <div class="success-box">
+      <h1>Order received</h1>
+      <p>Thank you, {{ order.customer_name }}. Your order number is</p>
+      <p class="order-number">{{ order.order_number }}</p>
+      <p class="status-line">Status: <strong>{{ order.status }}</strong> &middot; Payment: <strong>{{ order.payment_status }}</strong> ({{ order.payment_method }})</p>
+    </div>
+
+    {% if can_pay_online %}
+    <div class="wa-box">
+      <p>Your order is saved but <strong>not paid yet</strong>. Complete your payment securely with Paystack.</p>
+      <form method="post" action="{{ url_for('pay_order', order_number=order.order_number) }}" class="js-loading">
+        <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+        <button class="btn btn-orange btn-lg" type="submit">Pay online now</button>
+      </form>
+    </div>
+    {% endif %}
+
+    {% if wa_link %}
+    <div class="wa-box">
+      <p>Send your order details to us on WhatsApp so we can confirm it quickly.</p>
+      <a class="btn btn-wa btn-lg" href="{{ wa_link }}" target="_blank" rel="noopener">Send order on WhatsApp</a>
+    </div>
+    {% else %}
+    <p class="notice">WhatsApp ordering is not available right now. We will contact you on {{ order.phone }} to confirm.</p>
+    {% endif %}
+
+    <h2>Items</h2>
+    <div class="summary summary-flat">
+      {% for item in items %}<div class="sum-row"><span>{{ item.quantity }} &times; {{ item.product_name }}</span><span>{{ (item.unit_price * item.quantity)|naira }}</span></div>{% endfor %}
+      <div class="sum-row sum-total"><span>Total</span><span>{{ order.total|naira }}</span></div>
+    </div>
+
+    <h2>Delivery details</h2>
+    <p>{{ order.customer_name }}<br>{{ order.phone }}{% if order.email %}<br>{{ order.email }}{% endif %}<br>{{ order.address }}</p>
+    {% if order.notes %}<p class="muted">Notes: {{ order.notes }}</p>{% endif %}
+    <p class="muted">Placed {{ order.created_at|pretty_date }} (UTC). Keep your order number for any enquiry.</p>
+    <a class="btn btn-dark" href="{{ url_for('shop') }}">Continue shopping</a>
+  </div>
+</section>
+{% endblock %}

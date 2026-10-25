@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}About | {{ store.name }}{% endblock %}
+{% block content %}
+<section class="page-head"><div class="container"><h1>About Pajealex Fashion Hub</h1></div></section>
+<section class="section">
+  <div class="container narrow prose">
+    <p>Pajealex Fashion Hub is a Nigerian fashion store for clothing, shoes, sneakers and accessories. We want you to look sharp without a long trip to the market.</p>
+    <h2>How ordering works</h2>
+    <p>Pick what you like, add it to your cart and place your order with your delivery details. You can send the order to us on WhatsApp, and you pay on delivery. We confirm each order with you before it ships.</p>
+    <h2>Our promise</h2>
+    <p>Clear prices in naira, honest stock levels and a real person to talk to if something is not right.</p>
+    <a class="btn btn-orange" href="{{ url_for('shop') }}">Start shopping</a>
+  </div>
+</section>
+{% endblock %}
