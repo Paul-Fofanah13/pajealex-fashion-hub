@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block head_extra %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block content %}
+<div class="admin-bar">
+  <div class="container admin-nav">
+    <a href="{{ url_for('admin_dashboard') }}" {% if request.endpoint == 'admin_dashboard' %}aria-current="page"{% endif %}>Dashboard</a>
+    <a href="{{ url_for('admin_products') }}" {% if request.endpoint and request.endpoint.startswith('admin_product') %}aria-current="page"{% endif %}>Products</a>
+    <a href="{{ url_for('admin_orders') }}" {% if request.endpoint in ('admin_orders', 'admin_order_detail') %}aria-current="page"{% endif %}>Orders</a>
+    <a href="{{ url_for('index') }}">View store</a>
+    <form method="post" action="{{ url_for('admin_logout') }}" class="admin-logout">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+      <button type="submit" class="link-btn">Log out</button>
+    </form>
+  </div>
+</div>
+{% block admin_content %}{% endblock %}
+{% endblock %}
