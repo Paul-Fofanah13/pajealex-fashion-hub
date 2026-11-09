@@ -1,0 +1,40 @@
+{% extends "admin_base.html" %}
+{% block title %}Products | Admin{% endblock %}
+{% block admin_content %}
+<section class="section">
+  <div class="container">
+    <div class="section-head"><h1 style="font-size:2rem;margin:0">Products</h1><a class="btn btn-orange" href="{{ url_for('admin_product_new') }}">Add product</a></div>
+    {% if products %}
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>Photo</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for p in products %}
+        <tr>
+          <td><img class="thumb" src="{{ product_image(p.image) }}" alt=""></td>
+          <td><strong>{{ p.name }}</strong>{% if p.featured %} <span class="pill">Featured</span>{% endif %}{% if p.best_seller %} <span class="pill">Best seller</span>{% endif %}</td>
+          <td>{{ p.category }}</td>
+          <td>{{ p.price|naira }}</td>
+          <td>
+            <form method="post" action="{{ url_for('admin_product_stock', product_id=p.id) }}" class="stock-form">
+              <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+              <label class="sr-only" for="stock-{{ p.id }}">Stock for {{ p.name }}</label>
+              <input id="stock-{{ p.id }}" type="number" name="stock" value="{{ p.stock }}" min="0" max="100000">
+              <button class="btn btn-dark btn-sm" type="submit">Save</button>
+            </form>
+          </td>
+          <td class="actions">
+            <a class="btn btn-sm" href="{{ url_for('admin_product_edit', product_id=p.id) }}">Edit</a>
+            <form method="post" action="{{ url_for('admin_product_delete', product_id=p.id) }}" onsubmit="return confirm('Delete this product? This cannot be undone.');">
+              <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+              <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody></table></div>
+    {% else %}
+    <div class="empty-box"><h2>No products yet</h2><p>Add your first product to start selling.</p><a class="btn btn-orange" href="{{ url_for('admin_product_new') }}">Add product</a></div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
