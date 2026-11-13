@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Checkout | {{ store.name }}{% endblock %}
+{% macro err(name) %}{% if errors.get(name) %}<span class="field-error">{{ errors[name] }}</span>{% endif %}{% endmacro %}
+{% block content %}
+<section class="page-head"><div class="container"><h1>Checkout</h1></div></section>
+<section class="section">
+  <div class="container cart-layout">
+    <form method="post" action="{{ url_for('checkout') }}" class="form js-loading" novalidate>
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+      {% if errors %}<div class="flash flash-error" role="alert"><span>Please fix the highlighted fields.</span></div>{% endif %}
+      <div class="field {{ 'has-error' if errors.get('customer_name') }}">
+        <label for="customer_name">Full name</label>
+        <input id="customer_name" name="customer_name" value="{{ values.get('customer_name', '') }}" required maxlength="80" autocomplete="name">
+        {{ err('customer_name') }}
+      </div>
+      <div class="field {{ 'has-error' if errors.get('phone') }}">
+        <label for="phone">Phone number</label>
+        <input id="phone" name="phone" type="tel" value="{{ values.get('phone', '') }}" required maxlength="20" autocomplete="tel" placeholder="08012345678">
+        {{ err('phone') }}
+      </div>
+      <div class="field {{ 'has-error' if errors.get('address') }}">
+        <label for="address">Delivery address</label>
+        <textarea id="address" name="address" rows="3" required maxlength="300" autocomplete="street-address">{{ values.get('address', '') }}</textarea>
+        {{ err('address') }}
+      </div>
+      <div class="field {{ 'has-error' if errors.get('email') }}">
+        <label for="email">Email <span class="muted">(optional)</span></label>
+        <input id="email" name="email" type="email" value="{{ values.get('email', '') }}" maxlength="120" autocomplete="email">
+        {{ err('email') }}
+      </div>
+      <div class="field {{ 'has-error' if errors.get('notes') }}">
+        <label for="notes">Order notes <span class="muted">(optional)</span></label>
+        <textarea id="notes" name="notes" rows="2" maxlength="500" placeholder="Size, colour, delivery time">{{ values.get('notes', '') }}</textarea>
+        {{ err('notes') }}
+      </div>
+      <fieldset class="field">
+        <legend>How will you pay?</legend>
+        {% for key, label in payment_methods.items() %}
+        <label class="radio"><input type="radio" name="payment_method" value="{{ key }}" {% if values.get('payment_method', 'whatsapp') == key %}checked{% endif %}> {{ label }}</label>
+        {% endfor %}
+        {% if 'paystack' not in payment_methods %}
+        <label class="radio radio-off"><input type="radio" disabled> Pay online by card or transfer (not available yet)</label>
+        {% endif %}
+        {{ err('payment_method') }}
+      </fieldset>
+      <button class="btn btn-orange btn-lg" type="submit">Place order</button>
+      <p class="muted">Placing an order does not take payment. We confirm your order and delivery with you first.</p>
+    </form>
+    <aside class="summary">
+      <h2>Your order</h2>
+      {% for line in lines %}<div class="sum-row"><span>{{ line.qty }} &times; {{ line.product.name }}</span><span>{{ line.subtotal|naira }}</span></div>{% endfor %}
+      <div class="sum-row sum-total"><span>Total</span><span>{{ total|naira }}</span></div>
+      <a class="btn btn-block btn-ghost" href="{{ url_for('cart') }}">Edit cart</a>
+    </aside>
+  </div>
+</section>
+{% endblock %}

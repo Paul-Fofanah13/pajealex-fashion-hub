@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Your cart | {{ store.name }}{% endblock %}
+{% block content %}
+<section class="page-head"><div class="container"><h1>Your cart</h1></div></section>
+<section class="section">
+  <div class="container">
+    {% if not lines %}
+    <div class="empty-box">
+      <h2>Your cart is empty</h2>
+      <p>Browse the shop and tap &ldquo;Add to cart&rdquo; on anything you like.</p>
+      <a class="btn btn-orange" href="{{ url_for('shop') }}">Go to the shop</a>
+    </div>
+    {% else %}
+    <div class="cart-layout">
+      <div class="cart-list">
+        {% for line in lines %}
+        {% set p = line.product %}
+        <div class="cart-row">
+          <a href="{{ url_for('product_detail', product_id=p.id) }}"><img src="{{ product_image(p.image) }}" alt="{{ p.name }}"></a>
+          <div class="cart-info">
+            <a class="cart-name" href="{{ url_for('product_detail', product_id=p.id) }}">{{ p.name }}</a>
+            <span class="muted">{{ p.price|naira }} each</span>
+            {% if line.over_stock %}<span class="inline-error">Only {{ p.stock }} in stock. Lower the quantity to continue.</span>{% endif %}
+          </div>
+          <form method="post" action="{{ url_for('cart_update') }}" class="qty">
+            <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+            <input type="hidden" name="product_id" value="{{ p.id }}">
+            <button name="action" value="dec" class="qty-btn" aria-label="Decrease quantity of {{ p.name }}">&minus;</button>
+            <span class="qty-num" aria-live="polite">{{ line.qty }}</span>
+            <button name="action" value="inc" class="qty-btn" aria-label="Increase quantity of {{ p.name }}" {% if line.qty >= p.stock %}disabled{% endif %}>+</button>
+          </form>
+          <p class="line-total">{{ line.subtotal|naira }}</p>
+          <form method="post" action="{{ url_for('cart_remove') }}">
+            <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+            <input type="hidden" name="product_id" value="{{ p.id }}">
+            <button class="link-btn" type="submit">Remove</button>
+          </form>
+        </div>
+        {% endfor %}
+      </div>
+      <aside class="summary">
+        <h2>Order summary</h2>
+        {% for line in lines %}<div class="sum-row"><span>{{ line.qty }} &times; {{ line.product.name }}</span><span>{{ line.subtotal|naira }}</span></div>{% endfor %}
+        <div class="sum-row sum-total"><span>Total</span><span>{{ total|naira }}</span></div>
+        <p class="muted">Delivery fee, if any, is confirmed with you after you order.</p>
+        {% if has_problem %}
+        <button class="btn btn-block" type="button" disabled>Fix stock issues to continue</button>
+        {% else %}
+        <a class="btn btn-orange btn-block" href="{{ url_for('checkout') }}">Go to checkout</a>
+        {% endif %}
+        <a class="btn btn-block btn-ghost" href="{{ url_for('shop') }}">Keep shopping</a>
+      </aside>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Contact | {{ store.name }}{% endblock %}
+{% block content %}
+<section class="page-head"><div class="container"><h1>Contact us</h1></div></section>
+<section class="section">
+  <div class="container narrow prose">
+    {% if store.whatsapp or store.phone or store.email or store.address %}
+    <p>The fastest way to reach us is WhatsApp. We reply as soon as we can.</p>
+    <ul class="contact-list">
+      {% if store.whatsapp %}<li><strong>WhatsApp</strong> <a href="https://wa.me/{{ store.whatsapp }}" target="_blank" rel="noopener">Start a chat</a></li>{% endif %}
+      {% if store.phone %}<li><strong>Phone</strong> {{ store.phone }}</li>{% endif %}
+      {% if store.email %}<li><strong>Email</strong> <a href="mailto:{{ store.email }}">{{ store.email }}</a></li>{% endif %}
+      {% if store.address %}<li><strong>Address</strong> {{ store.address }}</li>{% endif %}
+    </ul>
+    {% else %}
+    <p class="notice">Contact details have not been added yet. The store owner can add them in the <code>.env</code> file.</p>
+    {% endif %}
+    <p>Have an order number? Include it in your message so we can find your order quickly.</p>
+  </div>
+</section>
+{% endblock %}
