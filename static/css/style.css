@@ -376,6 +376,18 @@ body{background:#fff}
   .card-body{padding:.8rem}
   .section-head{align-items:flex-start;flex-direction:column}
 }
+.site-logo {
+    height: 55px;
+    width: auto;
+    max-width: 220px;
+    object-fit: contain;
+    display: block;
+}
+
+.site-header .logo {
+    display: flex;
+    align-items: center;
+}
 @media(prefers-reduced-motion:reduce){
   .card,.cat-tile,.hero-art img,.btn{transition:none!important}
 }
