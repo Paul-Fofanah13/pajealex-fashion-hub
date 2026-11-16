@@ -15,10 +15,11 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="container header-row">
-    <a class="logo" href="{{ url_for('index') }}" aria-label="{{ store.name }} home">
-      <span class="logo-mark">P</span>
-      <span class="logo-text">Pajealex<small>Fashion Hub</small></span>
-    </a>
+   <a class="logo" href="{{ url_for('index') }}" aria-label="{{ store.name }} home">
+  <img src="{{ url_for('static', filename='images/pajealex-logo.png') }}"
+       alt="PAJEALEX Fashion Hub"
+       class="site-logo">
+</a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav" aria-label="Open menu"><span></span><span></span><span></span></button>
     <nav id="nav" class="nav">
       <a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}aria-current="page"{% endif %}>Home</a>
